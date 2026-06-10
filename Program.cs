@@ -13,8 +13,17 @@ internal class Program{
     private static readonly string[] Books = Directory.GetFiles("Books");
     private static Random rnd = new();
     private static async Task Main(string[] args){
+        Console.Clear();
+        List<string> list =getBookText();
+        List<int> selectedLines = new();
+        for (int i = 0; i < 5; i++){
+            int index = rnd.Next(0, list.Count);
+            if (selectedLines.Contains(index)){i--; continue;}
+            Console.Write($"{list[index]}");
+            selectedLines.Add(index);
+        }
 
-        File.WriteAllText("text.txt",getBookText());
+        Console.WriteLine("");
 
     }
 
@@ -36,16 +45,17 @@ internal class Program{
         return 99999;
     }
 
-    private static string getBookText(){
+    private static List<string> getBookText(){
         string bookName = getBook(rnd.Next(0, Books.Length));
         
         using var document = PdfDocument.Open($"Books/{bookName}");
         List<string> pages = document.GetPages().Skip(getStartPage(bookName))
                         .Select(x => x.Text)
-                        .Where(x => x.Length >= 100).ToList();
+                        .Where(x => x.Length >= 50)
+                        .ToList();
 
         pages = pages.Select(x => cleanText(x)).ToList();
-        return buildString(pages);
+        return buildString(pages).Split('.').Select(x => x + ".").ToList();
     }
 
     private static string buildString(List<string> list){
@@ -63,7 +73,7 @@ internal class Program{
         if (text.Contains("PART") || text.Contains("Chapter"))
         {
             int delStringLen = 0;
-            for (int i = 0; i < 30; i++){
+            for (int i = 0; i < 30 || i <  text.Length; i++){
                 if (char.IsDigit(text[i])){
                     delStringLen = i + 1;
                     break;
@@ -73,7 +83,8 @@ internal class Program{
             text = text.Remove(0,delStringLen);
         }
 
-
+        text = text.Replace("’", "");
+        text = Regex.Replace(text, @"\s+", " ").Trim();
 
 
         return text;
