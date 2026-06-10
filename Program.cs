@@ -1,6 +1,5 @@
 ﻿using UglyToad.PdfPig;
 using System.Text.RegularExpressions;
-using System.Text;
 
 
 
@@ -12,6 +11,8 @@ internal class Program{
 
     private static readonly string[] Books = Directory.GetFiles("Books");
     private static Random rnd = new();
+
+    //Main function
     private static async Task Main(string[] args){
         Console.Clear();
         List<string> list =getBookText();
@@ -26,10 +27,6 @@ internal class Program{
         Console.WriteLine("");
 
     }
-
-
-
-
 
 
 
@@ -86,11 +83,68 @@ internal class Program{
         text = text.Replace("’", "");
         text = Regex.Replace(text, @"\s+", " ").Trim();
 
-
+        text = StringFixer.fixConcatenatedWords(text);
         return text;
     }
 
+
+
 }
 
+
+static class StringFixer{
+    private static readonly HashSet<string> WordList=
+        File.ReadAllLines("words.txt")
+            .Select(w => w.Trim().ToLower())
+            .Where(w => w.Length > 0)
+            .ToHashSet();
+    public static string fixConcatenatedWords(string text)
+    {
+    string[] words = text.Split(' ');
+
+    for (int i = 0; i < words.Length; i++)
+    {
+        words[i] = trySplitWord(words[i]);
+    }
+
+        return string.Join(" ", words);
+    }
+    
+    public static string trySplitWord(string word)
+    {
+        // Strip leading/trailing punctuation, remember it
+        int start = 0;
+        int end = word.Length;
+        while (start < end && !char.IsLetter(word[start])) start++;
+        while (end > start && !char.IsLetter(word[end - 1])) end--;
+    
+        string prefix = word.Substring(0, start);
+        string core = word.Substring(start, end - start);
+        string suffix = word.Substring(end);
+    
+        // Nothing to check, or already a valid word → leave it alone
+        if (core.Length < 6 || WordList.Contains(core.ToLower()))
+            return word;
+    
+        string lower = core.ToLower();
+    
+        // Try every split point; both halves must be real words of 3+ chars
+        for (int i = 3; i <= lower.Length - 3; i++)
+        {
+            string left = lower.Substring(0, i);
+            string right = lower.Substring(i);
+    
+            if (WordList.Contains(left) && WordList.Contains(right))
+            {
+                // Rebuild with original casing for the left part
+                string leftOriginal = core.Substring(0, i);
+                string rightOriginal = core.Substring(i);
+                return prefix + leftOriginal + " " + rightOriginal + suffix;
+            }
+        }
+    
+        return word;
+    }
+}
 
 
