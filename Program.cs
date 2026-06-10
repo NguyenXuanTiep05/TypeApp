@@ -14,8 +14,32 @@ internal class Program{
 
     //Main function
     private static async Task Main(string[] args){
+        bool programRunning = true;
+        Console.CursorVisible = false;
+        writeText();
+
+        while (programRunning){
+            Console.WriteLine("");
+            var key = Console.ReadKey();
+
+            if (key.Key == ConsoleKey.Q && key.Modifiers == ConsoleModifiers.Control){
+                programRunning = false;
+            }
+            else if (key.Key == ConsoleKey.R && key.Modifiers == ConsoleModifiers.Control){
+                writeText();
+            }
+        }
+
+
+
         Console.Clear();
-        List<string> list =getBookText();
+
+
+    }
+
+    private static void writeText(){
+        Console.Clear();
+        List<string> list = getBookText();
         List<int> selectedLines = new();
         for (int i = 0; i < 5; i++){
             int index = rnd.Next(0, list.Count);
@@ -23,9 +47,6 @@ internal class Program{
             Console.Write($"{list[index]}");
             selectedLines.Add(index);
         }
-
-        Console.WriteLine("");
-
     }
 
 
@@ -52,11 +73,13 @@ internal class Program{
                         .ToList();
 
         pages = pages.Select(x => cleanText(x)).ToList();
-        return buildString(pages).Split('.').Select(x => x + ".").ToList();
+        return Regex.Split(buildString(pages), @"(?<=[.?])")
+            .Where(x => x.Length >= 5)
+            .ToList();
     }
 
     private static string buildString(List<string> list){
-        return string.Concat(list);
+        return string.Concat(list).Replace("‘", "");
     }
 
     private static string cleanText(string text){
@@ -81,6 +104,7 @@ internal class Program{
         }
 
         text = text.Replace("’", "");
+        text = text.Replace("—", "-");
         text = Regex.Replace(text, @"\s+", " ").Trim();
 
         text = StringFixer.fixConcatenatedWords(text);
