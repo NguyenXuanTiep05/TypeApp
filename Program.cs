@@ -13,10 +13,13 @@ internal class Program{
     private static Random rnd = new();
 
     //Main function
+    //command for word wrap dotnet run | fold -s -w $(tput cols)
     private static async Task Main(string[] args){
         bool programRunning = true;
         Console.CursorVisible = false;
-        writeText();
+        List<string> list = getBookText();
+
+        writeText(list);
 
         while (programRunning){
             Console.WriteLine("");
@@ -26,7 +29,7 @@ internal class Program{
                 programRunning = false;
             }
             else if (key.Key == ConsoleKey.R && key.Modifiers == ConsoleModifiers.Control){
-                writeText();
+                writeText(list);
             }
         }
 
@@ -37,9 +40,8 @@ internal class Program{
 
     }
 
-    private static void writeText(){
+    private static void writeText(List<string> list){
         Console.Clear();
-        List<string> list = getBookText();
         List<int> selectedLines = new();
         for (int i = 0; i < 5; i++){
             int index = rnd.Next(0, list.Count);
