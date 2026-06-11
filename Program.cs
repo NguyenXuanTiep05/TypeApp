@@ -15,7 +15,7 @@ internal class Program{
     private static readonly string[] Books = Directory.GetFiles("Books");
     private readonly static Random rnd = new();
     private static bool hasMistakes = true;
-    private static int textLength = 50;
+    private static int textLength = 500;
 
     //Main function
     //command for word wrap dotnet run | fold -s -w $(tput cols)
@@ -39,24 +39,24 @@ internal class Program{
                 typedString.Clear();
                 text = FormatTypingText(list);
             }
-            else if (key.Key == ConsoleKey.Backspace)
+            else if (key.Key == ConsoleKey.Backspace && typedString.Length > 0)
             {
                 if (key.Modifiers == ConsoleModifiers.Control){WordDelete(ref typedString, text);}
-                else if (typedString.Length > 0){typedString.Remove(typedString.Length - 1, 1);}
+                else {typedString.Remove(typedString.Length - 1, 1);}
 
             }
 
             else
             {
-                if(typedString.Length != text.Length){typedString.Append(key.KeyChar);}
+                if(typedString.Length != text.Length && key.Key != ConsoleKey.Backspace){typedString.Append(key.KeyChar);}
             }
             WriteText(text, typedString.ToString());
 
             if (hasMistakes == false && text.Length == typedString.Length){
                 WriteFinish();
-                Console.ReadKey();
-                typedString.Clear();
-                text = FormatTypingText(list);
+                // Console.ReadKey();
+                // typedString.Clear();
+                // text = FormatTypingText(list);
             }
         }
 
@@ -95,7 +95,7 @@ internal class Program{
     private static void WriteHeader()
     {
         Console.Clear();
-        Console.WriteLine("Typing app \t\t To quit: CTRL + Q\t New text: CTRL + R\t");
+        Console.WriteLine("Typing app \t\t To quit: CTRL + Q/C\t New text: CTRL + R\t");
     }
     private static string FormatTypingText(List<string> list)
     {
@@ -106,19 +106,19 @@ internal class Program{
             if (length >= textLength){break;}
             int index = rnd.Next(0, list.Count);
             string sentence = list[index];
-            if (sentence.Length > textLength && sentence.Length >= length){ i--;continue;}
+            if ((sentence.Length + sentence.Length) > textLength && sentence.Length >= length){ i--;continue;}
             if (selectedLines.Contains(index)){i--; continue;}
             builder.Append($"{sentence} ");
             selectedLines.Add(index);
             length += sentence.Length;
         }
-        return CleanText(builder.ToString());
+        return CleanText(builder.ToString())+ new string(' ', textLength);
     }
 
     private static void WordDelete(ref StringBuilder typedText, string text)
     {
         if (text.Length > 0){typedText.Remove(typedText.Length - 1, 1);}
-        while (text.Length > 0 && text[typedText.Length - 1] != ' ' && text[typedText.Length - 1] != '_')
+        while (typedText.Length > 0 && text[typedText.Length - 1] != ' ' && text[typedText.Length - 1] != '_')
         {
             typedText.Remove(typedText.Length - 1, 1);
         }
@@ -181,6 +181,7 @@ internal class Program{
         text = Regex.Replace(text, @"(?<![a-zA-Z])[""‟‟""„’”“]|[""‟‟""„’”“](?![a-zA-Z])", "");
         text = Regex.Replace(text, @"(?<![a-zA-Z]),(?![a-zA-Z])", ", ");
         text = Regex.Replace(text, @"[""‟‟""„’”“]", "'");
+        text = Regex.Replace(text, @"\b\w*[^\x00-\x7F]\w*\b", "");
         text = text.Replace("—", "");
         text = Regex.Replace(text, @"\s+", " ");
         text = text.Substring(1);
