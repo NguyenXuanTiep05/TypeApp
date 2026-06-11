@@ -205,6 +205,13 @@ internal class Program{
         selectedBook = bookName;
         string fullText = string.Join(" ",pages);
         fullText = fullText.Trim();
+        fullText = Regex.Replace(fullText , @"[^\w\s\-.,;:!?()@#$%&+=]", match => 
+        {
+            // Only replace if it looks like a quote character
+            if (char.IsLetter(match.Value[0]) || char.IsDigit(match.Value[0]))
+                return match.Value;
+            return "'";
+        });
         fullText = Regex.Replace(fullText, @"'[^']*'", m => m.Value.Replace(".", "◆"));
         return Regex.Split(fullText, @"(?<=[.?!])\s+")
                                     .Select(x => x.Replace("\n", " ")) 
