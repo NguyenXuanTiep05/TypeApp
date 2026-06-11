@@ -1,4 +1,5 @@
-﻿using UglyToad.PdfPig;
+﻿using System.Diagnostics;
+using UglyToad.PdfPig;
 using System.Text.RegularExpressions;
 using System.Text;
 using System.Data;
@@ -15,8 +16,12 @@ internal class Program{
     private static readonly string[] BooksEpub = Directory.GetFiles("Books/Epub", "*.epub");
     private readonly static Random rnd = new();
     private static bool hasMistakes = true;
-    private static int textLength = 70;
+    private static int textLength = 100;
     private static string selectedBook = "";
+    private static Stopwatch stopwatch = new ();
+    
+
+
     
 
 
@@ -44,6 +49,8 @@ internal class Program{
             else if (key.Key == ConsoleKey.R && key.Modifiers == ConsoleModifiers.Control){
                 typedString.Clear();
                 text = FormatTypingText(list, false);
+                stopwatch.Reset();
+
                 WriteHeader();
                 WriteText(text);
                 continue;
@@ -59,7 +66,13 @@ internal class Program{
             {
                 if(!Char.IsControl(key.KeyChar) && typedString.Length != text.Length && key.Key != ConsoleKey.Backspace 
                             && (key.Modifiers == ConsoleModifiers.None || key.Modifiers == ConsoleModifiers.Shift))
-                {typedString.Append(key.KeyChar);}
+                {
+                    typedString.Append(key.KeyChar);
+                    if (!stopwatch.IsRunning){
+                        stopwatch.Start();
+                    }
+                }
+
             }
             UpdateText(text, typedString.ToString());
 
@@ -103,7 +116,13 @@ internal class Program{
 
     private static void WriteFinish()
     {
-        string finnishedString = @"Finnished";
+        stopwatch.Stop();
+        TimeSpan ts = stopwatch.Elapsed;
+        string elapsedTime = String.Format("{0:00}:{1:00}",
+            ts.Minutes, ts.Seconds);
+        stopwatch.Reset();
+
+        string finnishedString = $"Finnished in: {elapsedTime}";
         Console.SetCursorPosition(0,textPosition + 1);
         Console.WriteLine(finnishedString + new string(' ', Console.WindowWidth - finnishedString.Length));
         Console.SetCursorPosition(0,textPosition + 1);
@@ -214,11 +233,11 @@ internal class Program{
                 return match.Value;
             return "'";
         });
-        fullText = Regex.Replace(fullText, @"'[^']*'", m => m.Value.Replace(".", "◆"));
+        fullText = Regex.Replace(fullText, @"'[^']*'", m => m.Value.Replace(".", "◆").Replace("?","◇").Replace("!","◈"));
         return Regex.Split(fullText, @"(?<=[.?!])\s+")
                                     .Select(x => x.Replace("\n", " ")) 
                                     .Select(x => Regex.Replace(x, @"\s+", " "))  
-                                    .Select(x => x.Replace("◆", ".")) 
+                                    .Select(x => x.Replace("◆", ".").Replace("◇", "?").Replace("◈", "!")) 
                                     .ToList();
 
 
