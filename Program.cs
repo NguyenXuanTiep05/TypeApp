@@ -3,6 +3,7 @@ using System.Text.RegularExpressions;
 using System.Text;
 using UglyToad.PdfPig.PdfFonts;
 using System.Threading.Tasks.Dataflow;
+using System.Data;
 
 
 
@@ -15,7 +16,7 @@ internal class Program{
     private static readonly string[] Books = Directory.GetFiles("Books");
     private readonly static Random rnd = new();
     private static bool hasMistakes = true;
-    private static int textLength = 500;
+    private static int textLength = 70;
 
     //Main function
     //command for word wrap dotnet run | fold -s -w $(tput cols)
@@ -26,7 +27,7 @@ internal class Program{
         string text = FormatTypingText(list);text = char.ToUpper(text[0]) + text.Substring(1);
         StringBuilder typedString = new();
         WriteHeader();
-        WriteText(text, typedString.ToString());
+        WriteText(text);
 
         while (programRunning){
             Console.WriteLine("");
@@ -38,19 +39,22 @@ internal class Program{
             else if (key.Key == ConsoleKey.R && key.Modifiers == ConsoleModifiers.Control){
                 typedString.Clear();
                 text = FormatTypingText(list);
+                WriteText(text);
+                continue;
             }
             else if (key.Key == ConsoleKey.Backspace && typedString.Length > 0)
             {
                 if (key.Modifiers == ConsoleModifiers.Control){WordDelete(ref typedString, text);}
-                else {typedString.Remove(typedString.Length - 1, 1);}
+                else {CharDelete(ref typedString, text);}
 
             }
 
             else
             {
-                if(typedString.Length != text.Length && key.Key != ConsoleKey.Backspace){typedString.Append(key.KeyChar);}
+                if(typedString.Length != text.Length && key.Key != ConsoleKey.Backspace && (key.Modifiers == ConsoleModifiers.None || key.Modifiers == ConsoleModifiers.Shift))
+                {typedString.Append(key.KeyChar);}
             }
-            WriteText(text, typedString.ToString());
+            UpdateText(text, typedString.ToString());
 
             if (hasMistakes == false && text.Length == typedString.Length){
                 WriteFinish();
@@ -67,28 +71,35 @@ internal class Program{
 
     }
 
-    private static void WriteText(string text, string typedText){
-
+    private static void WriteText(string text){
         Console.SetCursorPosition(0,2);
-        Console.WriteLine(text);
-        Console.SetCursorPosition(0, 2);
+        Console.WriteLine(text +  new string(' ', textLength));
+        Console.SetCursorPosition(0,3);
+    }
+
+    private static void UpdateText(string text, string typedText)
+    {
+        Console.SetCursorPosition(0,2);
+        Console.SetCursorPosition(Math.Max(typedText.Length - 1, 0), 2);
         for (int i = 0; i < typedText.Length; i++)
         {
             hasMistakes = false;
-            if (text[i] == typedText[i]){Console.BackgroundColor = ConsoleColor.Green;}
-            else {Console.BackgroundColor = ConsoleColor.Red; hasMistakes = true;}
-            Console.Write(text[i]);
-            Console.ResetColor();
+            if (text[i] != typedText[i]){ hasMistakes = true;}
         }
+        Console.BackgroundColor = typedText.Length > 0 ? 
+                    (text[typedText.Length - 1] == typedText[typedText.Length - 1] ? ConsoleColor.Green : ConsoleColor.Red) : ConsoleColor.Black;
+        Console.WriteLine(typedText.Length == 0 ?"" : text[typedText.Length - 1]);
         Console.SetCursorPosition(0,3);
+        Console.ResetColor();
     }
+
+    
 
     private static void WriteFinish()
     {
         string finnishedString = @"Finnished";
         Console.SetCursorPosition(0,2);
         Console.WriteLine(finnishedString + new string(' ', Console.WindowWidth - finnishedString.Length));
-        Console.SetCursorPosition(0, 2);
         Console.SetCursorPosition(0,3);
     }
 
@@ -112,17 +123,33 @@ internal class Program{
             selectedLines.Add(index);
             length += sentence.Length;
         }
-        return CleanText(builder.ToString())+ new string(' ', textLength);
+        return CleanText(builder.ToString());
     }
 
     private static void WordDelete(ref StringBuilder typedText, string text)
     {
-        if (text.Length > 0){typedText.Remove(typedText.Length - 1, 1);}
+        if (text.Length > 0){
+            Console.SetCursorPosition(typedText.Length - 1,2);
+            Console.WriteLine(text[typedText.Length - 1]);
+            Console.SetCursorPosition(0,3);
+            typedText.Remove(typedText.Length - 1, 1);            
+        }
         while (typedText.Length > 0 && text[typedText.Length - 1] != ' ' && text[typedText.Length - 1] != '_')
         {
+            Console.SetCursorPosition(typedText.Length - 1,2);
+            Console.WriteLine(text[typedText.Length - 1]);
+            Console.SetCursorPosition(0,3);
             typedText.Remove(typedText.Length - 1, 1);
-        }
 
+        }
+    }
+
+    private static void CharDelete(ref StringBuilder typedText, string text)
+    {
+            Console.SetCursorPosition(typedText.Length - 1,2);
+            Console.WriteLine(text[typedText.Length - 1]);
+            Console.SetCursorPosition(0,3);
+            typedText.Remove(typedText.Length - 1, 1);
     }
 
     private static string GetBookName(int index){
