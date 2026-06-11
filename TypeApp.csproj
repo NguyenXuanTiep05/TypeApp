@@ -9,6 +9,7 @@
 
   <ItemGroup>
     <PackageReference Include="UglyToad.PdfPig" Version="1.7.0-custom-5" />
+    <PackageReference Include="VersOne.Epub" Version="3.3.6" />
   </ItemGroup>
   
 

@@ -4,7 +4,7 @@ using System.Text;
 using UglyToad.PdfPig.PdfFonts;
 using System.Threading.Tasks.Dataflow;
 using System.Data;
-
+using VersOne.Epub;
 
 
 
@@ -13,7 +13,8 @@ using System.Data;
 internal class Program{
     
 
-    private static readonly string[] Books = Directory.GetFiles("Books");
+    private static readonly string[] Books = Directory.GetFiles("Books","*.pdf");
+    private static readonly string[] BooksEpub = Directory.GetFiles("Books/Epub", "*.epub");
     private readonly static Random rnd = new();
     private static bool hasMistakes = true;
     private static int textLength = 70;
@@ -23,8 +24,9 @@ internal class Program{
     private static async Task Main(string[] args){
         bool programRunning = true;
         Console.CursorVisible = false;
-        List<string> list = GetBookText().OrderBy(x => x.Length).ToList();
-        string text = FormatTypingText(list);text = char.ToUpper(text[0]) + text.Substring(1);
+        List<string> list = GetBookTextEpub();
+        string text = FormatTypingText(list, false);
+        //text = char.ToUpper(text[0]) + text.Substring(1);
         StringBuilder typedString = new();
         WriteHeader();
         WriteText(text);
@@ -38,7 +40,7 @@ internal class Program{
             }
             else if (key.Key == ConsoleKey.R && key.Modifiers == ConsoleModifiers.Control){
                 typedString.Clear();
-                text = FormatTypingText(list);
+                text = FormatTypingText(list, false);
                 WriteText(text);
                 continue;
             }
@@ -109,7 +111,7 @@ internal class Program{
         Console.Clear();
         Console.WriteLine("Typing app \t\t To quit: CTRL + Q/C\t New text: CTRL + R\t");
     }
-    private static string FormatTypingText(List<string> list)
+    private static string FormatTypingText(List<string> list, bool cleanText = true)
     {
         List<int> selectedLines = new();
         int length = 0;
@@ -124,6 +126,7 @@ internal class Program{
             selectedLines.Add(index);
             length += sentence.Length;
         }
+        if (!cleanText){return builder.ToString().Trim();}
         return CleanText(builder.ToString());
     }
 
@@ -153,7 +156,8 @@ internal class Program{
             typedText.Remove(typedText.Length - 1, 1);
     }
 
-    private static string GetBookName(int index){
+    private static string GetBookName(int index, bool pdf = true){
+        if (!pdf){return Path.GetFileName(BooksEpub[index]);}
         return Path.GetFileName(Books[index]);
 
     }
@@ -177,8 +181,29 @@ internal class Program{
 
 
         pages = pages.Select(x => CleanText(x) + " ").ToList();
-        return Regex.Split(BuildString(pages), @"(?<=[.?])").Where(x => x.Length > 30)
+        return Regex.Split(BuildString(pages), @"(?<=[.?!])").Where(x => x.Length > 30)
             .ToList();
+    }
+
+
+    private static List<string> GetBookTextEpub()
+    {
+        string bookName = GetBookName(rnd.Next(0, Books.Length), false);
+        
+        var book = EpubReader.ReadBook($"Books/Epub/{bookName}");
+        var pages = book.ReadingOrder.Skip(GetStartPage(ref bookName))
+                                .SelectMany(x => Regex.Matches(x.Content, $"<p[^>]*>(.*?)</p>", RegexOptions.Singleline)
+                                .Select(x => x.Groups[1].Value)
+                                .Select(x => Regex.Replace(x, $"<[^>]*>", ""))).ToList();
+        string fullText = string.Join(" ",pages);
+        fullText = fullText.Trim();
+        fullText = Regex.Replace(fullText, @"'[^']*'", m => m.Value.Replace(".", "◆"));
+        return Regex.Split(fullText, @"(?<=[.?!])\s+")
+                                    .Select(x => x.Replace("\n", " ")) 
+                                    .Select(x => Regex.Replace(x, @"\s+", " "))  
+                                    .Select(x => x.Replace("◆", ".")) 
+                                    .ToList();
+
     }
 
     private static string BuildString(List<string> list){
