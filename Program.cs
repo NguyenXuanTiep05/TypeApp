@@ -18,6 +18,7 @@ internal class Program{
     private readonly static Random rnd = new();
     private static bool hasMistakes = true;
     private static int textLength = 70;
+    private static string selectedBook = "";
 
     //Main function
     //command for word wrap dotnet run | fold -s -w $(tput cols)
@@ -110,9 +111,14 @@ internal class Program{
     {
         Console.Clear();
         Console.WriteLine("Typing app \t\t To quit: CTRL + Q/C\t New text: CTRL + R\t");
+        Console.WriteLine($"Selected book: {selectedBook}");
     }
     private static string FormatTypingText(List<string> list, bool cleanText = true)
     {
+        if (list == null || list.Count == 0)
+        {
+            return "Error: No sentences available";  
+        }
         List<int> selectedLines = new();
         int length = 0;
         StringBuilder builder = new();
@@ -178,6 +184,7 @@ internal class Program{
                         .Select(x => x.Text)
                         .Where(x => x.Length >= 50)
                         .ToList();
+        selectedBook = bookName;
 
 
         pages = pages.Select(x => CleanText(x) + " ").ToList();
@@ -188,13 +195,14 @@ internal class Program{
 
     private static List<string> GetBookTextEpub()
     {
-        string bookName = GetBookName(rnd.Next(0, Books.Length), false);
+        string bookName = GetBookName(rnd.Next(0, BooksEpub.Length), false);
         
         var book = EpubReader.ReadBook($"Books/Epub/{bookName}");
         var pages = book.ReadingOrder.Skip(GetStartPage(ref bookName))
                                 .SelectMany(x => Regex.Matches(x.Content, $"<p[^>]*>(.*?)</p>", RegexOptions.Singleline)
                                 .Select(x => x.Groups[1].Value)
                                 .Select(x => Regex.Replace(x, $"<[^>]*>", ""))).ToList();
+        selectedBook = bookName;
         string fullText = string.Join(" ",pages);
         fullText = fullText.Trim();
         fullText = Regex.Replace(fullText, @"'[^']*'", m => m.Value.Replace(".", "◆"));
@@ -203,6 +211,7 @@ internal class Program{
                                     .Select(x => Regex.Replace(x, @"\s+", " "))  
                                     .Select(x => x.Replace("◆", ".")) 
                                     .ToList();
+
 
     }
 
