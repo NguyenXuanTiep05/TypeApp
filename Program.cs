@@ -1,6 +1,8 @@
 ﻿using UglyToad.PdfPig;
 using System.Text.RegularExpressions;
 using System.Text;
+using UglyToad.PdfPig.PdfFonts;
+using System.Threading.Tasks.Dataflow;
 
 
 
@@ -12,6 +14,8 @@ internal class Program{
 
     private static readonly string[] Books = Directory.GetFiles("Books");
     private readonly static Random rnd = new();
+    private static bool hasMistakes = true;
+    private static int textLength = 50;
 
     //Main function
     //command for word wrap dotnet run | fold -s -w $(tput cols)
@@ -19,7 +23,10 @@ internal class Program{
         bool programRunning = true;
         Console.CursorVisible = false;
         List<string> list = GetBookText().OrderBy(x => x.Length).ToList();
-        WriteText(list);
+        string text = FormatTypingText(list);text = char.ToUpper(text[0]) + text.Substring(1);
+        StringBuilder typedString = new();
+        WriteHeader();
+        WriteText(text, typedString.ToString());
 
         while (programRunning){
             Console.WriteLine("");
@@ -29,7 +36,27 @@ internal class Program{
                 programRunning = false;
             }
             else if (key.Key == ConsoleKey.R && key.Modifiers == ConsoleModifiers.Control){
-                WriteText(list);
+                typedString.Clear();
+                text = FormatTypingText(list);
+            }
+            else if (key.Key == ConsoleKey.Backspace)
+            {
+                if (key.Modifiers == ConsoleModifiers.Control){WordDelete(ref typedString, text);}
+                else if (typedString.Length > 0){typedString.Remove(typedString.Length - 1, 1);}
+
+            }
+
+            else
+            {
+                if(typedString.Length != text.Length){typedString.Append(key.KeyChar);}
+            }
+            WriteText(text, typedString.ToString());
+
+            if (hasMistakes == false && text.Length == typedString.Length){
+                WriteFinish();
+                Console.ReadKey();
+                typedString.Clear();
+                text = FormatTypingText(list);
             }
         }
 
@@ -40,26 +67,63 @@ internal class Program{
 
     }
 
-    private static void WriteText(List<string> list){
+    private static void WriteText(string text, string typedText){
+
+        Console.SetCursorPosition(0,2);
+        Console.WriteLine(text);
+        Console.SetCursorPosition(0, 2);
+        for (int i = 0; i < typedText.Length; i++)
+        {
+            hasMistakes = false;
+            if (text[i] == typedText[i]){Console.BackgroundColor = ConsoleColor.Green;}
+            else {Console.BackgroundColor = ConsoleColor.Red; hasMistakes = true;}
+            Console.Write(text[i]);
+            Console.ResetColor();
+        }
+        Console.SetCursorPosition(0,3);
+    }
+
+    private static void WriteFinish()
+    {
+        string finnishedString = @"Finnished";
+        Console.SetCursorPosition(0,2);
+        Console.WriteLine(finnishedString + new string(' ', Console.WindowWidth - finnishedString.Length));
+        Console.SetCursorPosition(0, 2);
+        Console.SetCursorPosition(0,3);
+    }
+
+    private static void WriteHeader()
+    {
         Console.Clear();
+        Console.WriteLine("Typing app \t\t To quit: CTRL + Q\t New text: CTRL + R\t");
+    }
+    private static string FormatTypingText(List<string> list)
+    {
         List<int> selectedLines = new();
         int length = 0;
         StringBuilder builder = new();
         for (int i = 0; i < 5; i++){
-            if (length >= 1000){break;}
+            if (length >= textLength){break;}
             int index = rnd.Next(0, list.Count);
             string sentence = list[index];
-            if (sentence.Length > 500 && sentence.Length >= length){ i--;continue;}
+            if (sentence.Length > textLength && sentence.Length >= length){ i--;continue;}
             if (selectedLines.Contains(index)){i--; continue;}
-            builder.Append($"{" " + sentence}");
+            builder.Append($"{sentence} ");
             selectedLines.Add(index);
             length += sentence.Length;
         }
-
-        Console.WriteLine(CleanText(builder.ToString()));
+        return CleanText(builder.ToString());
     }
 
+    private static void WordDelete(ref StringBuilder typedText, string text)
+    {
+        if (text.Length > 0){typedText.Remove(typedText.Length - 1, 1);}
+        while (text.Length > 0 && text[typedText.Length - 1] != ' ' && text[typedText.Length - 1] != '_')
+        {
+            typedText.Remove(typedText.Length - 1, 1);
+        }
 
+    }
 
     private static string GetBookName(int index){
         return Path.GetFileName(Books[index]);
@@ -85,7 +149,7 @@ internal class Program{
 
 
         pages = pages.Select(x => CleanText(x) + " ").ToList();
-        return Regex.Split(BuildString(pages), @"(?<=[.?])").Where(x => x.Length > 3)
+        return Regex.Split(BuildString(pages), @"(?<=[.?])").Where(x => x.Length > 30)
             .ToList();
     }
 
@@ -95,7 +159,7 @@ internal class Program{
 
     private static string CleanText(string text){
 
-        for (int i = text.Length - 1; i >= text.Length; i--){
+        for (int i = text.Length - 1; i >= text.Length - 6; i--){
             if (char.IsDigit(text[i])){
                 text = text.Remove(i,1);
             }
@@ -114,12 +178,13 @@ internal class Program{
             text = text.Remove(0,delStringLen);
         }
 
-        text = Regex.Replace(text , @"[""‟‟""„’”]", "");
+        text = Regex.Replace(text, @"(?<![a-zA-Z])[""‟‟""„’”“]|[""‟‟""„’”“](?![a-zA-Z])", "");
         text = Regex.Replace(text, @"(?<![a-zA-Z]),(?![a-zA-Z])", ", ");
-        text = text.Replace("—", "-");
+        text = Regex.Replace(text, @"[""‟‟""„’”“]", "'");
+        text = text.Replace("—", "");
         text = Regex.Replace(text, @"\s+", " ");
         text = text.Substring(1);
-        text = StringFixer.FixConcatenatedWords(text);
+        text = StringFixer.FixConcatenatedWords(text).Trim();
         return text;
     }
 
@@ -143,7 +208,7 @@ static class StringFixer
     {
         "a", "i", "an", "am", "as", "at", "be", "by", "do", "go", "he",
         "if", "in", "is", "it", "me", "my", "no", "of", "oh", "on",
-        "or", "so", "to", "up", "us", "we"
+        "or", "so", "to", "up", "us", "we", "the"
     };
  
     // Missing-apostrophe repairs. Case-sensitive entries avoid clobbering
