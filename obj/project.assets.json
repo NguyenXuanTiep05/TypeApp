@@ -1,5 +1,5 @@
 {
-  "version": 3,
+  "version": 4,
   "targets": {
     "net10.0": {
       "UglyToad.PdfPig/1.7.0-custom-5": {
@@ -246,28 +246,36 @@
     ]
   },
   "packageFolders": {
-    "/home/peter/.nuget/packages/": {}
+    "C:\\Users\\nguyenxu\\.nuget\\packages\\": {},
+    "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "/home/peter/Programming_Projects/TypeApp/TypeApp.csproj",
+      "projectUniqueName": "C:\\Users\\nguyenxu\\OneDrive - SKB INDUSTRIEHOLDING GMBH\\Dokumenty\\Programming\\TypeApp\\TypeApp.csproj",
       "projectName": "TypeApp",
-      "projectPath": "/home/peter/Programming_Projects/TypeApp/TypeApp.csproj",
-      "packagesPath": "/home/peter/.nuget/packages/",
-      "outputPath": "/home/peter/Programming_Projects/TypeApp/obj/",
+      "projectPath": "C:\\Users\\nguyenxu\\OneDrive - SKB INDUSTRIEHOLDING GMBH\\Dokumenty\\Programming\\TypeApp\\TypeApp.csproj",
+      "packagesPath": "C:\\Users\\nguyenxu\\.nuget\\packages\\",
+      "outputPath": "C:\\Users\\nguyenxu\\OneDrive - SKB INDUSTRIEHOLDING GMBH\\Dokumenty\\Programming\\TypeApp\\obj\\",
       "projectStyle": "PackageReference",
+      "fallbackFolders": [
+        "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
+      ],
       "configFilePaths": [
-        "/home/peter/.nuget/NuGet/NuGet.Config"
+        "C:\\Users\\nguyenxu\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
+        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
       "originalTargetFrameworks": [
         "net10.0"
       ],
       "sources": {
+        "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
         "https://api.nuget.org/v3/index.json": {}
       },
       "frameworks": {
         "net10.0": {
+          "framework": "net10.0",
           "targetAlias": "net10.0",
           "projectReferences": {}
         }
@@ -282,10 +290,11 @@
         "auditLevel": "low",
         "auditMode": "all"
       },
-      "SdkAnalysisLevel": "10.0.100"
+      "SdkAnalysisLevel": "10.0.300"
     },
     "frameworks": {
       "net10.0": {
+        "framework": "net10.0",
         "targetAlias": "net10.0",
         "dependencies": {
           "UglyToad.PdfPig": {
@@ -304,18 +313,12 @@
         ],
         "assetTargetFallback": true,
         "warn": true,
-        "downloadDependencies": [
-          {
-            "name": "Microsoft.AspNetCore.App.Ref",
-            "version": "[10.0.8, 10.0.8]"
-          }
-        ],
         "frameworkReferences": {
           "Microsoft.NETCore.App": {
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "/usr/share/dotnet/sdk/10.0.108/PortableRuntimeIdentifierGraph.json",
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.301/PortableRuntimeIdentifierGraph.json",
         "packagesToPrune": {
           "Microsoft.CSharp": "(,4.7.32767]",
           "Microsoft.VisualBasic": "(,10.4.32767]",
