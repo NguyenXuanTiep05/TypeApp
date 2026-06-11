@@ -51,7 +51,8 @@ internal class Program{
 
             else
             {
-                if(typedString.Length != text.Length && key.Key != ConsoleKey.Backspace && (key.Modifiers == ConsoleModifiers.None || key.Modifiers == ConsoleModifiers.Shift))
+                if(!Char.IsControl(key.KeyChar) && typedString.Length != text.Length && key.Key != ConsoleKey.Backspace 
+                            && (key.Modifiers == ConsoleModifiers.None || key.Modifiers == ConsoleModifiers.Shift))
                 {typedString.Append(key.KeyChar);}
             }
             UpdateText(text, typedString.ToString());
