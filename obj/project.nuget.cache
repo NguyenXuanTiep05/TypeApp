@@ -1,15 +1,16 @@
 {
   "version": 2,
-  "dgSpecHash": "wcAFNYmYvD4=",
+  "dgSpecHash": "Rzt2e984wFw=",
   "success": true,
-  "projectFilePath": "C:\\Users\\nguyenxu\\OneDrive - SKB INDUSTRIEHOLDING GMBH\\Dokumenty\\Programming\\TypeApp\\TypeApp.csproj",
+  "projectFilePath": "/home/peter/Programming_Projects/TypeApp/TypeApp.csproj",
   "expectedPackageFiles": [
-    "C:\\Users\\nguyenxu\\.nuget\\packages\\uglytoad.pdfpig\\1.7.0-custom-5\\uglytoad.pdfpig.1.7.0-custom-5.nupkg.sha512",
-    "C:\\Users\\nguyenxu\\.nuget\\packages\\uglytoad.pdfpig.core\\1.7.0-custom-5\\uglytoad.pdfpig.core.1.7.0-custom-5.nupkg.sha512",
-    "C:\\Users\\nguyenxu\\.nuget\\packages\\uglytoad.pdfpig.fonts\\1.7.0-custom-5\\uglytoad.pdfpig.fonts.1.7.0-custom-5.nupkg.sha512",
-    "C:\\Users\\nguyenxu\\.nuget\\packages\\uglytoad.pdfpig.tokenization\\1.7.0-custom-5\\uglytoad.pdfpig.tokenization.1.7.0-custom-5.nupkg.sha512",
-    "C:\\Users\\nguyenxu\\.nuget\\packages\\uglytoad.pdfpig.tokens\\1.7.0-custom-5\\uglytoad.pdfpig.tokens.1.7.0-custom-5.nupkg.sha512",
-    "C:\\Users\\nguyenxu\\.nuget\\packages\\versone.epub\\3.3.6\\versone.epub.3.3.6.nupkg.sha512"
+    "/home/peter/.nuget/packages/uglytoad.pdfpig/1.7.0-custom-5/uglytoad.pdfpig.1.7.0-custom-5.nupkg.sha512",
+    "/home/peter/.nuget/packages/uglytoad.pdfpig.core/1.7.0-custom-5/uglytoad.pdfpig.core.1.7.0-custom-5.nupkg.sha512",
+    "/home/peter/.nuget/packages/uglytoad.pdfpig.fonts/1.7.0-custom-5/uglytoad.pdfpig.fonts.1.7.0-custom-5.nupkg.sha512",
+    "/home/peter/.nuget/packages/uglytoad.pdfpig.tokenization/1.7.0-custom-5/uglytoad.pdfpig.tokenization.1.7.0-custom-5.nupkg.sha512",
+    "/home/peter/.nuget/packages/uglytoad.pdfpig.tokens/1.7.0-custom-5/uglytoad.pdfpig.tokens.1.7.0-custom-5.nupkg.sha512",
+    "/home/peter/.nuget/packages/versone.epub/3.3.6/versone.epub.3.3.6.nupkg.sha512",
+    "/home/peter/.nuget/packages/microsoft.aspnetcore.app.ref/10.0.8/microsoft.aspnetcore.app.ref.10.0.8.nupkg.sha512"
   ],
   "logs": []
 }

@@ -1,8 +1,6 @@
 ﻿using UglyToad.PdfPig;
 using System.Text.RegularExpressions;
 using System.Text;
-using UglyToad.PdfPig.PdfFonts;
-using System.Threading.Tasks.Dataflow;
 using System.Data;
 using VersOne.Epub;
 
@@ -19,6 +17,10 @@ internal class Program{
     private static bool hasMistakes = true;
     private static int textLength = 70;
     private static string selectedBook = "";
+    
+
+
+    private static int textPosition = 3;
 
     //Main function
     //command for word wrap dotnet run | fold -s -w $(tput cols)
@@ -42,6 +44,7 @@ internal class Program{
             else if (key.Key == ConsoleKey.R && key.Modifiers == ConsoleModifiers.Control){
                 typedString.Clear();
                 text = FormatTypingText(list, false);
+                WriteHeader();
                 WriteText(text);
                 continue;
             }
@@ -76,24 +79,23 @@ internal class Program{
     }
 
     private static void WriteText(string text){
-        Console.SetCursorPosition(0,2);
+        Console.SetCursorPosition(0,textPosition);
         Console.WriteLine(text +  new string(' ', textLength));
-        Console.SetCursorPosition(0,3);
+        Console.SetCursorPosition(0,textPosition + 1);
     }
 
     private static void UpdateText(string text, string typedText)
     {
-        Console.SetCursorPosition(0,2);
-        Console.SetCursorPosition(Math.Max(typedText.Length - 1, 0), 2);
+        Console.SetCursorPosition(Math.Max(typedText.Length - 1, 0), textPosition);
         for (int i = 0; i < typedText.Length; i++)
         {
             hasMistakes = false;
             if (text[i] != typedText[i]){ hasMistakes = true;}
         }
         Console.BackgroundColor = typedText.Length > 0 ? 
-                    (text[typedText.Length - 1] == typedText[typedText.Length - 1] ? ConsoleColor.Green : ConsoleColor.Red) : ConsoleColor.Black;
+                    (text[typedText.Length - 1] == typedText[typedText.Length - 1] ? ConsoleColor.Blue: ConsoleColor.Red) : ConsoleColor.Black;
         Console.WriteLine(typedText.Length == 0 ?"" : text[typedText.Length - 1]);
-        Console.SetCursorPosition(0,3);
+        Console.SetCursorPosition(0,textPosition + 1);
         Console.ResetColor();
     }
 
@@ -102,9 +104,9 @@ internal class Program{
     private static void WriteFinish()
     {
         string finnishedString = @"Finnished";
-        Console.SetCursorPosition(0,2);
+        Console.SetCursorPosition(0,textPosition + 1);
         Console.WriteLine(finnishedString + new string(' ', Console.WindowWidth - finnishedString.Length));
-        Console.SetCursorPosition(0,3);
+        Console.SetCursorPosition(0,textPosition + 1);
     }
 
     private static void WriteHeader()
@@ -139,16 +141,16 @@ internal class Program{
     private static void WordDelete(ref StringBuilder typedText, string text)
     {
         if (text.Length > 0){
-            Console.SetCursorPosition(typedText.Length - 1,2);
+            Console.SetCursorPosition(typedText.Length - 1,textPosition);
             Console.WriteLine(text[typedText.Length - 1]);
-            Console.SetCursorPosition(0,3);
+            Console.SetCursorPosition(0,textPosition + 1);
             typedText.Remove(typedText.Length - 1, 1);            
         }
         while (typedText.Length > 0 && text[typedText.Length - 1] != ' ' && text[typedText.Length - 1] != '_')
         {
-            Console.SetCursorPosition(typedText.Length - 1,2);
+            Console.SetCursorPosition(typedText.Length - 1,textPosition);
             Console.WriteLine(text[typedText.Length - 1]);
-            Console.SetCursorPosition(0,3);
+            Console.SetCursorPosition(0,textPosition + 1);
             typedText.Remove(typedText.Length - 1, 1);
 
         }
@@ -156,9 +158,9 @@ internal class Program{
 
     private static void CharDelete(ref StringBuilder typedText, string text)
     {
-            Console.SetCursorPosition(typedText.Length - 1,2);
+            Console.SetCursorPosition(typedText.Length - 1,textPosition);
             Console.WriteLine(text[typedText.Length - 1]);
-            Console.SetCursorPosition(0,3);
+            Console.SetCursorPosition(0,textPosition + 1);
             typedText.Remove(typedText.Length - 1, 1);
     }
 
