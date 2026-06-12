@@ -99,15 +99,27 @@ internal class Program{
 
     private static void UpdateText(string text, string typedText)
     {
-        Console.SetCursorPosition(Math.Max(typedText.Length - 1, 0), textPosition);
+        int col = (typedText.Length - 1) % Console.WindowWidth;
+        int row = textPosition + (typedText.Length - 1) / Console.WindowWidth;
+        Console.SetCursorPosition(Math.Max(col, 0), row);
         for (int i = 0; i < typedText.Length; i++)
         {
             hasMistakes = false;
             if (text[i] != typedText[i]){ hasMistakes = true;}
         }
-        Console.BackgroundColor = typedText.Length > 0 ? 
-                    (text[typedText.Length - 1] == typedText[typedText.Length - 1] ? ConsoleColor.Blue: ConsoleColor.Red) : ConsoleColor.Black;
-        Console.WriteLine(typedText.Length == 0 ?"" : text[typedText.Length - 1]);
+        if (typedText.Length > 0 && (text[typedText.Length - 1] == typedText[typedText.Length - 1]))
+        {
+
+            Console.ForegroundColor =  ConsoleColor.Blue;
+        }
+        else
+        {
+            
+            Console.BackgroundColor =  ConsoleColor.Red;
+        }
+        Console.WriteLine(typedText.Length == 0 ?"" : (text[typedText.Length - 1] == ' ' 
+                                    &&  Console.BackgroundColor != ConsoleColor.Red
+                                        ? "_" : text[typedText.Length - 1]));
         Console.SetCursorPosition(0,textPosition + 1);
         Console.ResetColor();
     }
@@ -160,14 +172,18 @@ internal class Program{
     private static void WordDelete(ref StringBuilder typedText, string text)
     {
         if (text.Length > 0){
-            Console.SetCursorPosition(typedText.Length - 1,textPosition);
+            int col = (typedText.Length - 1) % Console.WindowWidth;
+            int row = textPosition + (typedText.Length - 1) / Console.WindowWidth;
+            Console.SetCursorPosition(Math.Max(col, 0), row);
             Console.WriteLine(text[typedText.Length - 1]);
             Console.SetCursorPosition(0,textPosition + 1);
             typedText.Remove(typedText.Length - 1, 1);            
         }
         while (typedText.Length > 0 && text[typedText.Length - 1] != ' ' && text[typedText.Length - 1] != '_')
         {
-            Console.SetCursorPosition(typedText.Length - 1,textPosition);
+            int col = (typedText.Length - 1) % Console.WindowWidth;
+            int row = textPosition + (typedText.Length - 1) / Console.WindowWidth;
+            Console.SetCursorPosition(Math.Max(col, 0), row);
             Console.WriteLine(text[typedText.Length - 1]);
             Console.SetCursorPosition(0,textPosition + 1);
             typedText.Remove(typedText.Length - 1, 1);
@@ -177,7 +193,9 @@ internal class Program{
 
     private static void CharDelete(ref StringBuilder typedText, string text)
     {
-            Console.SetCursorPosition(typedText.Length - 1,textPosition);
+            int col = (typedText.Length - 1) % Console.WindowWidth;
+            int row = textPosition + (typedText.Length - 1) / Console.WindowWidth;
+            Console.SetCursorPosition(Math.Max(col, 0), row);
             Console.WriteLine(text[typedText.Length - 1]);
             Console.SetCursorPosition(0,textPosition + 1);
             typedText.Remove(typedText.Length - 1, 1);
