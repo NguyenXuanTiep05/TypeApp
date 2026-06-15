@@ -62,6 +62,18 @@ internal class Program{
 
             }
 
+
+            else if (key.Key == ConsoleKey.N && key.Modifiers == ConsoleModifiers.Control)
+            {
+                list = GetBookTextEpub();
+                typedString.Clear();
+                text = FormatTypingText(list, false);
+                stopwatch.Reset();
+
+                WriteHeader();
+                WriteText(text);
+            }
+
             else
             {
                 if(!Char.IsControl(key.KeyChar) && typedString.Length != text.Length && key.Key != ConsoleKey.Backspace 
@@ -143,7 +155,7 @@ internal class Program{
     private static void WriteHeader()
     {
         Console.Clear();
-        Console.WriteLine("Typing app \t\t To quit: CTRL + Q/C\t New text: CTRL + R\t");
+        Console.WriteLine("Typing app \t\t To quit: CTRL + Q/C\t New text: CTRL + R\t Another book:CTRL + N ");
         Console.WriteLine($"Selected book: {selectedBook}");
     }
     private static string FormatTypingText(List<string> list, bool cleanText = true)
