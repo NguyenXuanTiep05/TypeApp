@@ -251,7 +251,7 @@ internal class Program{
                 return match.Value;
             return "'";
         });
-        fullText = Regex.Replace(fullText, @"'[^']*'", m => m.Value.Replace(".", "◆").Replace("?","◇").Replace("!","◈"));
+        fullText = Regex.Replace(fullText, @"(?<!\w)'[^']*'(?!\w)", m => m.Value.Replace(".", "◆").Replace("?","◇").Replace("!","◈"));
         return Regex.Split(fullText, @"(?<=[.?!])\s+")
                                     .Select(x => x.Replace("\n", " ")) 
                                     .Select(x => Regex.Replace(x, @"\s+", " "))  
